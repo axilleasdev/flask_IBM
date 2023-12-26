@@ -116,3 +116,41 @@ def name_search():
         if query.lower() in person["first_name"].lower():
             return person
     return ({"message": "Person not found"}, 404)
+
+
+@app.route("/count")
+def count():
+    try:
+        return ({"data count": len(data)}, 200)
+    except NameError:
+        return ({"message": "data not defined"}, 500)
+
+
+@app.route("/person/<string:var_name>")
+def find_by_uuid(var_name):
+    for person in data:
+        if person["id"] == str(var_name):
+            return person
+    return ({"message": "insert not found message here"}, 404)
+
+
+@app.route("/person/<string:id>", methods=["DELETE"])
+def delete_by_uuid(id):
+    for person in data:
+        if person["id"] == str(id):
+            data.remove(person)
+            return {"message": "Person deteleted", "status_code": 200}
+    return {"message": "insert not found message here"}, 404
+
+
+@app.route("/person", methods=["POST"])
+def add_by_uuid():
+    new_person = request.json
+    if not new_person:
+           return {"message" : "Invalid input parameters"}, 422
+    try:
+        data.append(new_person)
+    except NameError:
+           return {"message" : "data not defined"}, 500
+
+    return {"message" : f"{new_person['id']}"}, 200
